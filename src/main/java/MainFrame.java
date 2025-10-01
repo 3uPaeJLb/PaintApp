@@ -1,8 +1,8 @@
+import java.awt.*;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainFrame extends JFrame {
-
+public class MainFrame extends JFrame{
     private DrawField drawField;
 
     public MainFrame()
@@ -14,10 +14,8 @@ public class MainFrame extends JFrame {
 
         drawField = new DrawField();
         add(drawField);
+
+        this.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        MainFrame mainFrame = new MainFrame();
-        mainFrame.setVisible(true);
-    }
 }
