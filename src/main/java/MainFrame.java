@@ -1,21 +1,94 @@
-import java.awt.*;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
-public class MainFrame extends JFrame{
-    private DrawField drawField;
+public class MainFrame extends JFrame {
 
-    public MainFrame()
-    {
+    private final DrawField drawField;
+    private final JToolBar toolBar;
+
+    private final JButton pencilBtn;
+    private final JButton brushBtn;
+    private final JButton eraserBtn;
+    private final JButton colorBtn;
+    private final JButton saveBtn;
+
+    public MainFrame() {
         super("Paint");
+
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setBounds(400, 100, 640, 480);
+        setBounds(400, 100, 800, 600);
         setMinimumSize(new Dimension(640, 480));
 
         drawField = new DrawField();
-        add(drawField);
+        add(drawField, BorderLayout.CENTER);
 
-        this.setVisible(true);
+        // === TOOLBAR ===
+        toolBar = new JToolBar();
+        toolBar.setFloatable(false); // фиксируем тулбар
+
+        // Загрузка иконок с масштабированием
+        pencilBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/pen.png", "Карандаш");
+        brushBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/brush.png", "Кисть");
+        eraserBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/eraser.png", "Ластик");
+        colorBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/palette.png", "Выбрать цвет");
+        saveBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/save.png", "Сохранить");
+
+        toolBar.add(pencilBtn);
+        toolBar.add(brushBtn);
+        toolBar.add(eraserBtn);
+        toolBar.add(colorBtn);
+        toolBar.add(saveBtn);
+
+        toolBar.addSeparator(new Dimension(15, 0));
+        toolBar.add(new JLabel("Размер: "));
+
+        JSlider sizeSlider = new JSlider(1, 50, 4);
+        sizeSlider.setPreferredSize(new Dimension(100, 18));
+        sizeSlider.setMinimumSize(new Dimension(100, 18));
+        sizeSlider.setMaximumSize(new Dimension(100, 18));
+        sizeSlider.setPaintTicks(false);
+        sizeSlider.setPaintLabels(false);
+        sizeSlider.addChangeListener(e -> drawField.setToolSize(sizeSlider.getValue()));
+
+        toolBar.add(sizeSlider);
+
+        add(toolBar, BorderLayout.NORTH);
+
+        pencilBtn.addActionListener(e -> drawField.setCurrentTool(Instruments.ToolType.PENCIL));
+        brushBtn.addActionListener(e -> drawField.setCurrentTool(Instruments.ToolType.BRUSH));
+        eraserBtn.addActionListener(e -> drawField.setCurrentTool(Instruments.ToolType.ERASER));
+
+        colorBtn.addActionListener(e -> {
+            Color selectedColor = JColorChooser.showDialog(this, "Выберите цвет", Color.BLACK);
+            if (selectedColor != null) {
+                drawField.setCurrentColor(selectedColor);
+            }
+        });
+
+        saveBtn.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Сохранить изображение");
+            int userSelection = fileChooser.showSaveDialog(this);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                if (!fileToSave.getName().toLowerCase().endsWith(".png")) {
+                    fileToSave = new File(fileToSave.getAbsolutePath() + ".png");
+                }
+                drawField.saveImage(fileToSave);
+            }
+        });
+
+        setVisible(true);
     }
 
+    private JButton createIconButton(String path, String tooltip) {
+        ImageIcon icon = new ImageIcon(path);
+        Image scaledImage = icon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        JButton button = new JButton(new ImageIcon(scaledImage));
+        button.setToolTipText(tooltip);
+        button.setPreferredSize(new Dimension(32, 32));
+        return button;
+    }
 }
