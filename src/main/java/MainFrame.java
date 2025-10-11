@@ -12,6 +12,8 @@ public class MainFrame extends JFrame {
     private final JButton eraserBtn;
     private final JButton colorBtn;
     private final JButton saveBtn;
+    private final JButton fillBtn; // добавить поле
+
 
     public MainFrame() {
         super("Paint");
@@ -23,22 +25,22 @@ public class MainFrame extends JFrame {
         drawField = new DrawField();
         add(drawField, BorderLayout.CENTER);
 
-        // === TOOLBAR ===
         toolBar = new JToolBar();
-        toolBar.setFloatable(false); // фиксируем тулбар
+        toolBar.setFloatable(false);
 
-        // Загрузка иконок с масштабированием
-        pencilBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/pen.png", "Карандаш");
-        brushBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/brush.png", "Кисть");
-        eraserBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/eraser.png", "Ластик");
-        colorBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/palette.png", "Выбрать цвет");
-        saveBtn = createIconButton("C:/Users/marti/Desktop/HomeProg/Java/Paint/Paint/src/main/java/icons/save.png", "Сохранить");
+        pencilBtn = createIconButton("/icons/pen.png", "Карандаш");
+        brushBtn = createIconButton("icons/brush.png", "Кисть");
+        eraserBtn = createIconButton("icons/eraser.png", "Ластик");
+        colorBtn = createIconButton("/icons/palette.png", "Выбрать цвет");
+        saveBtn = createIconButton("/icons/save.png", "Сохранить");
+        fillBtn = createIconButton("/icons/fill.png", "Заливка");
 
         toolBar.add(pencilBtn);
         toolBar.add(brushBtn);
         toolBar.add(eraserBtn);
         toolBar.add(colorBtn);
         toolBar.add(saveBtn);
+        toolBar.add(fillBtn);
 
         toolBar.addSeparator(new Dimension(15, 0));
         toolBar.add(new JLabel("Размер: "));
@@ -55,9 +57,10 @@ public class MainFrame extends JFrame {
 
         add(toolBar, BorderLayout.NORTH);
 
-        pencilBtn.addActionListener(e -> drawField.setCurrentTool(Instruments.ToolType.PENCIL));
-        brushBtn.addActionListener(e -> drawField.setCurrentTool(Instruments.ToolType.BRUSH));
-        eraserBtn.addActionListener(e -> drawField.setCurrentTool(Instruments.ToolType.ERASER));
+        pencilBtn.addActionListener(e -> drawField.setCurrentTool(InstrumentsType.PENCIL));
+        brushBtn.addActionListener(e -> drawField.setCurrentTool(InstrumentsType.BRUSH));
+        eraserBtn.addActionListener(e -> drawField.setCurrentTool(InstrumentsType.ERASER));
+        fillBtn.addActionListener(e -> drawField.setCurrentTool(InstrumentsType.FILL));
 
         colorBtn.addActionListener(e -> {
             Color selectedColor = JColorChooser.showDialog(this, "Выберите цвет", Color.BLACK);
@@ -83,8 +86,14 @@ public class MainFrame extends JFrame {
         setVisible(true);
     }
 
-    private JButton createIconButton(String path, String tooltip) {
-        ImageIcon icon = new ImageIcon(path);
+    private JButton createIconButton(String resourcePath, String tooltip) {
+        java.net.URL imageUrl = getClass().getResource(resourcePath);
+        if (imageUrl == null) {
+            System.err.println("Icon not found: " + resourcePath);
+            return new JButton(tooltip);
+        }
+
+        ImageIcon icon = new ImageIcon(imageUrl);
         Image scaledImage = icon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
         JButton button = new JButton(new ImageIcon(scaledImage));
         button.setToolTipText(tooltip);

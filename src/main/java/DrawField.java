@@ -10,16 +10,18 @@ import java.io.IOException;
 
 public class DrawField extends JPanel implements MouseListener, MouseMotionListener {
 
-    private int fieldWidth = 640;
-    private int fieldHeight = 480;
+    private int fieldWidth;
+    private int fieldHeight;
     private int prevX, prevY;
-    private Instruments.ToolType currentTool = Instruments.ToolType.PENCIL;
+    private InstrumentsType currentTool = InstrumentsType.PENCIL;
     private int toolSize = 4;
     private Color currentColor = Color.BLACK;
 
     private BufferedImage image;
 
     public DrawField() {
+        fieldWidth = 640;
+        fieldHeight = 480;
         image = new BufferedImage(fieldWidth, fieldHeight, BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g2d = image.createGraphics();
@@ -38,7 +40,7 @@ public class DrawField extends JPanel implements MouseListener, MouseMotionListe
         g.drawImage(image, 0, 0, this);
     }
 
-    public void setCurrentTool(Instruments.ToolType tool) {
+    public void setCurrentTool(InstrumentsType tool) {
         this.currentTool = tool;
     }
 
@@ -53,15 +55,15 @@ public class DrawField extends JPanel implements MouseListener, MouseMotionListe
     @Override
     public void mouseClicked(MouseEvent e){
         Graphics2D g2d = image.createGraphics();
-        if (currentTool == Instruments.ToolType.PENCIL) {
+        if (currentTool == InstrumentsType.PENCIL) {
             g2d.setColor(currentColor);
             g2d.fillOval(e.getX() - toolSize / 2, e.getY() - toolSize / 2, toolSize, toolSize);
             g2d.dispose();
-        } else if (currentTool == Instruments.ToolType.BRUSH) {
+        } else if (currentTool == InstrumentsType.BRUSH) {
             g2d.setColor(currentColor);
             g2d.fillOval(e.getX() - toolSize - 1, e.getY() - toolSize - 1, 2*toolSize, 2*toolSize);
             g2d.dispose();
-        } else if (currentTool == Instruments.ToolType.ERASER) {
+        } else if (currentTool == InstrumentsType.ERASER) {
             g2d.setColor(currentColor);
             g2d.fillOval(e.getX() - toolSize / 2, e.getY() -toolSize / 2, toolSize, toolSize);
             g2d.dispose();
@@ -96,17 +98,16 @@ public class DrawField extends JPanel implements MouseListener, MouseMotionListe
         Graphics2D g2d = image.createGraphics();
         g2d.setColor(currentColor);
 
-        if (currentTool == Instruments.ToolType.PENCIL) {
+        if (currentTool == InstrumentsType.PENCIL) {
             // Простой точечный овал
             g2d.fillOval(x - toolSize / 2, y - toolSize / 2, toolSize, toolSize);
         }
-        else if (currentTool == Instruments.ToolType.BRUSH) {
+        else if (currentTool == InstrumentsType.BRUSH) {
             int dx = x - prevX;
             int dy = y - prevY;
             int steps = Math.max(Math.abs(dx), Math.abs(dy));
 
             if (steps == 0) {
-                // Просто один мазок, если мышь почти не сдвинулась
                 g2d.fillOval(x - toolSize, y - toolSize, 2 * toolSize, 2 * toolSize);
             } else {
                 for (int i = 0; i <= steps; i++) {
@@ -116,7 +117,7 @@ public class DrawField extends JPanel implements MouseListener, MouseMotionListe
                 }
             }
         }
-        else if (currentTool == Instruments.ToolType.ERASER) {
+        else if (currentTool == InstrumentsType.ERASER) {
             g2d.setColor(Color.WHITE);
             g2d.fillOval(x - toolSize / 2, y - toolSize / 2, toolSize, toolSize);
         }
